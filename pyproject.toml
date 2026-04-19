@@ -21,8 +21,5 @@ dependencies = [
   "transformers>=4.40",
 ]
 
-[tool.setuptools]
-package-dir = {"" = "src"}
-
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]

@@ -2,7 +2,7 @@
 
 ---
 
-![VTS overview](./src/voice_text_sfx/assets/Thumbnail.png)
+![VTS overview](./voice_text_sfx/assets/Thumbnail.png)
 
 Generate sound effects from:
 
@@ -11,21 +11,15 @@ Generate sound effects from:
 
 If you have ever typed "metallic sci-fi impact with a short tail" and then immediately made a much more useful `pshh-kting` sound with your mouth, this repo is for you.
 
-
-
 ## Demo
 
----
-
-*[Demo link](https://spicy-pufferfish-699.notion.site/VTS-347cf95761f480f19dc0eb790e1467af?source=copy_link)*
+_[Demo link](https://spicy-pufferfish-699.notion.site/VTS-347cf95761f480f19dc0eb790e1467af?source=copy_link)_
 
 ## Checkpoints
 
----
-
 Pretrained checkpoints are available on Hugging Face:
 
-- https://huggingface.co/Daniel777/VTS
+- [https://huggingface.co/Daniel777/VTS](https://huggingface.co/Daniel777/VTS)
 
 Download:
 
@@ -34,11 +28,7 @@ pip install -U "huggingface_hub"
 hf download Daniel777/VTS model_voice_1030_24.pth vae_weight.pth --local-dir ./checkpoints
 ```
 
-
-
 ## 🌟 Why This Exists
-
----
 
 Describing sound with text alone is surprisingly hard.
 
@@ -49,8 +39,6 @@ That is why sound-design meetings often turn into a brief beatboxing session. Wh
 VTS turns that behavior into a new interface. Instead of relying on text alone, you can give the model a short vocal sketch together with a text prompt. The voice carries timing, contour, and feel; the text keeps the generation anchored to intent.
 
 This package isolates the older `voice_cond` path from the original workspace and repackages it as a small, reusable project.
-
-
 
 ## Installation
 
@@ -81,8 +69,6 @@ If `k-diffusion` does not install cleanly through `pyproject.toml`, install it d
 ```bash
 pip install git+https://github.com/crowsonkb/k-diffusion.git
 ```
-
-
 
 ## Quick Start
 
@@ -164,13 +150,11 @@ audio_path,conditioning_audio_path,caption,seconds_start,seconds_total
   - `cfg_scale=6.0`
   - `duration=3.0`
 
-
-
 ## 🙂‍↕️ Acknowledgements
 
 ---
 
-- Thanks to [OptimizerAI]([https://www.linkedin.com/company/optimizerai/](https://www.linkedin.com/company/optimizerai/)). I worked on this project while I was at OptimizerAI.
+- Thanks to [OptimizerAI](<[https://www.linkedin.com/company/optimizerai/](https://www.linkedin.com/company/optimizerai/)>). I worked on this project while I was at OptimizerAI.
 
 ## License
 
