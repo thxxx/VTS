@@ -1,6 +1,6 @@
 # VTS (Voice To Sound)
 
-Describing a sound with text is harder than it should be. You can hear it in your head immediately, but the moment you try to write it down, it usually turns into vague words or bad beatboxing.
+`Describing a sound with text is hard.` You can hear it in your head immediately, but the moment you try to write it down, it usually turns into vague words or bad beatboxing.
 
 VTS lets you do the obvious thing instead: sketch the sound with your voice, add a short text prompt, and generate a sound effect from both.
 
@@ -46,8 +46,6 @@ This package isolates the older `voice_cond` path from the original workspace an
 
 ## Installation
 
----
-
 Create a fresh environment first. Install the correct PyTorch build for your CUDA version before installing the package.
 
 ```bash
@@ -75,8 +73,6 @@ pip install git+https://github.com/crowsonkb/k-diffusion.git
 ```
 
 ## Quick Start
-
----
 
 ### Inference
 
@@ -154,14 +150,10 @@ audio_path,conditioning_audio_path,caption,seconds_start,seconds_total
   - `cfg_scale=6.0`
   - `duration=3.0`
 
-## 🙂‍↕️ Acknowledgements
-
----
+## 🤝 Acknowledgements
 
 - Thanks to [OptimizerAI](<[https://www.linkedin.com/company/optimizerai/](https://www.linkedin.com/company/optimizerai/)>). I worked on this project while I was at OptimizerAI.
 
 ## License
-
----
 
 MIT License. See [LICENSE](./LICENSE).
