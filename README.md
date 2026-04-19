@@ -1,8 +1,10 @@
 # VTS (Voice To Sound)
 
----
+Describing a sound with text is harder than it should be. You can hear it in your head immediately, but the moment you try to write it down, it usually turns into vague words or bad beatboxing.
 
-![VTS overview](./voice_text_sfx/assets/Thumbnail.png)
+VTS lets you do the obvious thing instead: sketch the sound with your voice, add a short text prompt, and generate a sound effect from both.
+
+<img src="./voice_text_sfx/assets/Thumbnail.png" alt="VTS overview" width="100%" />
 
 Generate sound effects from:
 
@@ -30,13 +32,15 @@ hf download Daniel777/VTS model_voice_1030_24.pth vae_weight.pth --local-dir ./c
 
 ## 🌟 Why This Exists
 
-Describing sound with text alone is surprisingly hard.
+**Describing sound with text alone is surprisingly hard.**
 
-Try picking a sound in your head (e.g., Minecraft chest opening or Creeper exploding). Can you describe the sound directly as text? At best, you can only describe the situation.
+Try picking a sound in your head (e.g., Minecraft chest opening or Creeper exploding). **Can you describe the sound directly as text?** At best, you can only describe the situation.
 
 That is why sound-design meetings often turn into a brief beatboxing session. When words stop being precise enough, people make the sound with their mouths.
 
-VTS turns that behavior into a new interface. Instead of relying on text alone, you can give the model a short vocal sketch together with a text prompt. The voice carries timing, contour, and feel; the text keeps the generation anchored to intent.
+VTS turns that behavior into a new interface. **Instead of relying on text alone, you can give the model a short vocal sketch together with a text prompt.**
+
+`The voice carries timing, contour, and feel; the text keeps the generation anchored to intent.`
 
 This package isolates the older `voice_cond` path from the original workspace and repackages it as a small, reusable project.
 
