@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voice-text-sfx"
+version = "0.1.0"
+description = "Voice-audio + text conditioned latent diffusion for sound effect generation"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = [
+  "einops>=0.7.0",
+  "k-diffusion @ git+https://github.com/crowsonkb/k-diffusion.git",
+  "librosa>=0.10.1",
+  "numpy>=1.24",
+  "packaging>=24.0",
+  "torch>=2.1",
+  "torchaudio>=2.1",
+  "torchsde>=0.2.6",
+  "transformers>=4.40",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
