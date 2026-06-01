@@ -1,10 +1,12 @@
 einops>=0.7.0
 git+https://github.com/crowsonkb/k-diffusion.git
 librosa>=0.10.1
-numpy>=1.24
+numpy>=1.24,<2
 packaging>=24.0
+protobuf>=4.25,<6
+sentencepiece>=0.1.99
+tokenizers>=0.19,<0.20
 torch>=2.1
 torchaudio>=2.1
 torchsde>=0.2.6
-transformers>=4.40
-
+transformers==4.40.2

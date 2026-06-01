@@ -63,13 +63,21 @@ class T5Conditioner(Conditioner):
             warnings.simplefilter("ignore")
             try:
                 self.tokenizer = AutoTokenizer.from_pretrained(t5_model_name)
-                self.model = T5EncoderModel.from_pretrained(t5_model_name).train(enable_grad).requires_grad_(enable_grad)
+                model = T5EncoderModel.from_pretrained(t5_model_name).train(enable_grad).requires_grad_(enable_grad).to(torch.float16)
             finally:
                 logging.disable(previous_level)
 
+        if self.enable_grad:
+            self.model = model
+        else:
+            self.__dict__["model"] = model
+
     def forward(self, texts: tp.Sequence[str], device: tp.Union[str, torch.device]) -> tuple[torch.Tensor, torch.Tensor]:
         device = torch.device(device)
-        self.model.to(device)
+        if device.type == "cuda":
+            self.model.to(device=device, dtype=torch.float16)
+        else:
+            self.model.to(device)
         self.proj_out.to(device)
 
         encoded = self.tokenizer(

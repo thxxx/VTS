@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import librosa
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -47,47 +48,53 @@ class VoiceConditionExtractor(nn.Module):
         return self.n_chroma + self.rms_repeats
 
     def forward(self, audio: torch.Tensor) -> torch.Tensor:
-        if audio.dim() == 1:
-            audio = audio.unsqueeze(0)
-
-        if audio.dim() == 2:
-            mono = audio
-        elif audio.dim() == 3:
-            mono = audio.mean(dim=1)
-        else:
-            raise ValueError(f"Unsupported audio shape: {tuple(audio.shape)}")
+        mono = self._mono_like_original(audio)
 
         spec = self.spec(mono)
         raw_chroma = torch.einsum("cf,bft->bct", self.fbanks.to(spec.device, spec.dtype), spec)
         norm_chroma = F.normalize(raw_chroma, p=float("inf"), dim=1, eps=1e-6)
 
-        rms = self._frame_rms(mono, target_frames=norm_chroma.shape[-1])
-        rms = self._min_max_normalize(rms).unsqueeze(1).expand(-1, self.rms_repeats, -1)
+        rms = self._rms_like_original(mono, target_frames=norm_chroma.shape[-1], dtype=norm_chroma.dtype)
 
         total = torch.cat((rms, norm_chroma), dim=1)
         return rearrange(total, "b d t -> b t d")
 
-    def _frame_rms(self, mono: torch.Tensor, target_frames: int) -> torch.Tensor:
-        rms = torch.sqrt(
-            F.avg_pool1d(
-                mono.unsqueeze(1).pow(2),
-                kernel_size=self.winlen,
-                stride=self.winhop,
-                padding=self.winlen // 2,
-            ).clamp_min(1e-8)
-        ).squeeze(1)
-        if rms.shape[-1] != target_frames:
-            rms = F.interpolate(rms.unsqueeze(1), size=target_frames, mode="linear", align_corners=False).squeeze(1)
-        return rms
-
     @staticmethod
-    def _min_max_normalize(values: torch.Tensor) -> torch.Tensor:
-        min_val = values.amin(dim=-1, keepdim=True)
-        max_val = values.amax(dim=-1, keepdim=True)
-        return (values - min_val) / (max_val - min_val + 1e-8)
+    def _mono_like_original(audio: torch.Tensor) -> torch.Tensor:
+        if audio.dim() == 3 and audio.shape[1] == 2:
+            mono = (audio[:, 0, :] + audio[:, 1, :]) / 2
+        elif audio.dim() == 3 and audio.shape[1] == 1:
+            mono = audio[:, 0, :]
+        elif audio.dim() == 2 and audio.shape[0] == 2:
+            mono = (audio[0, :] + audio[1, :]) / 2
+        elif audio.dim() == 2:
+            mono = audio
+        elif audio.dim() == 1:
+            mono = audio
+        else:
+            raise ValueError(f"Unsupported audio shape: {tuple(audio.shape)}")
+
+        if mono.dim() == 1:
+            mono = mono.unsqueeze(0)
+        return mono
+
+    def _rms_like_original(self, mono: torch.Tensor, target_frames: int, dtype: torch.dtype) -> torch.Tensor:
+        rms = librosa.feature.rms(y=mono.detach().float().cpu().numpy())
+        hop = rms.shape[-1] // target_frames
+
+        pooled = []
+        for i in range(target_frames):
+            start = max(i * hop - 3, 0)
+            end = (i + 1) * hop + 3
+            pooled.append(np.sum(rms[:, :, start:end], axis=-1, keepdims=True))
+
+        qrmss = torch.as_tensor(np.array(pooled), device=mono.device, dtype=dtype)
+        qrmss = qrmss.squeeze(-1).squeeze(-1)
+        qrmss = rearrange(qrmss, "t b -> b t").unsqueeze(1).expand(-1, self.rms_repeats, -1)
+        qrmss = (qrmss - qrmss.min()) / (qrmss.max() - qrmss.min())
+        return qrmss
 
 
 def make_voice_condition(audio: torch.Tensor, sample_rate: int = 44100) -> torch.Tensor:
     extractor = VoiceConditionExtractor(sample_rate=sample_rate).to(audio.device)
     return extractor(audio)
-

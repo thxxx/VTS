@@ -147,6 +147,12 @@ def generate_audio(
     denoiser = K.external.VDenoiser(model)
 
     x = noise * sigmas[0]
+    if device.type == "cuda":
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = False
+        torch.backends.cudnn.benchmark = False
+
     use_autocast = device.type == "cuda"
     autocast_dtype = torch.float16 if device.type == "cuda" else torch.bfloat16
     with torch.autocast(device_type=device.type, dtype=autocast_dtype, enabled=use_autocast):

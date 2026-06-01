@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 from pathlib import Path
 
+import librosa
+import numpy as np
 import torch
 import torchaudio
 
@@ -140,7 +142,8 @@ class VoiceTextSFXPipeline:
         cfg_scale: float = 6.0,
     ) -> torch.Tensor:
         with torch.no_grad():
-            voice_cond = self.voice_extractor(prompt_audio.to(self.device))
+            self.voice_extractor.cpu()
+            voice_cond = self.voice_extractor(prompt_audio.detach().cpu()).to(self.device)
             return generate_audio(
                 self.model,
                 self.autoencoder,
@@ -164,7 +167,7 @@ class VoiceTextSFXPipeline:
         steps: int = 100,
         cfg_scale: float = 6.0,
     ) -> torch.Tensor:
-        audio, sr = torchaudio.load(prompt_audio_path)
+        audio, sr = _load_audio(prompt_audio_path)
         if sr != self.autoencoder.sample_rate:
             audio = torchaudio.functional.resample(audio, sr, self.autoencoder.sample_rate)
         if audio.dim() == 2:
@@ -183,3 +186,22 @@ class VoiceTextSFXPipeline:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         torchaudio.save(str(output_path), audio.detach().cpu().squeeze(0), sample_rate)
 
+
+def _load_audio(path: str | Path) -> tuple[torch.Tensor, int]:
+    try:
+        return torchaudio.load(path)
+    except Exception as torchaudio_error:
+        try:
+            audio_np, sr = librosa.load(str(path), sr=None, mono=False)
+        except Exception as librosa_error:
+            raise RuntimeError(
+                f"Could not load prompt audio {path!s} with torchaudio or librosa. "
+                "For the most reliable path, convert the prompt to WAV at 44.1 kHz."
+            ) from librosa_error
+
+        audio_np = np.asarray(audio_np, dtype=np.float32)
+        if audio_np.ndim == 1:
+            audio_np = audio_np[None, :]
+        elif audio_np.ndim > 2:
+            raise RuntimeError(f"Unsupported prompt audio shape from librosa: {audio_np.shape}") from torchaudio_error
+        return torch.from_numpy(audio_np), int(sr)

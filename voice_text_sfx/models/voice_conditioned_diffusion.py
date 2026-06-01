@@ -230,10 +230,6 @@ class VoiceConditionedDiffusionTransformer(nn.Module):
             )
 
             cfg_output = uncond_output + (cond_output - uncond_output) * cfg_scale
-            if scale_phi != 0.0:
-                cond_out_std = cond_output.std(dim=1, keepdim=True)
-                out_cfg_std = cfg_output.std(dim=1, keepdim=True).clamp_min(1e-6)
-                return scale_phi * (cfg_output * (cond_out_std / out_cfg_std)) + (1 - scale_phi) * cfg_output
             return cfg_output
 
         return self._forward(
