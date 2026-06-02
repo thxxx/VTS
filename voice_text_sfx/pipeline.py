@@ -51,7 +51,7 @@ def load_module_checkpoint(
     strip_prefixes: tuple[str, ...] = ("module.",),
     strict: bool = True,
 ):
-    checkpoint = torch.load(checkpoint_path, map_location="cpu")
+    checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
     state_dict = _extract_state_dict(checkpoint, preferred_keys=preferred_keys)
     state_dict = _strip_prefixes(state_dict, prefixes=strip_prefixes)
     module.load_state_dict(state_dict, strict=strict)
