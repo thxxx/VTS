@@ -59,13 +59,13 @@ Training code, datasets, notebooks, RunPod handler, Supabase upload code, OpenAI
 
 Pretrained checkpoints are available on Hugging Face:
 
-- [https://huggingface.co/Daniel777/textalignment](https://huggingface.co/Daniel777/textalignment)
+- [https://huggingface.co/Daniel777/VTS](https://huggingface.co/Daniel777/VTS)
 
 Download:
 
 ```bash
 pip install -U "huggingface_hub"
-hf download Daniel777/textalignment dynamic_v3_0415.ckpt --local-dir ./checkpoints
+hf download Daniel777/VTS dynamic_v3_0415.ckpt --local-dir ./checkpoints
 ```
 
 Recommended local layout:
