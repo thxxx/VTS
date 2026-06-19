@@ -383,11 +383,20 @@ def normalize_texts(texts: list[str], num_samples: int, alpha: float) -> tuple[l
     return texts, cfg_score
 
 
+def next_sample_index(output_dir: Path) -> int:
+    max_index = -1
+    if output_dir.is_dir():
+        for path in output_dir.glob("sample_*.wav"):
+            suffix = path.stem.removeprefix("sample_")
+            if suffix.isdigit():
+                max_index = max(max_index, int(suffix))
+    return max_index + 1
+
 def save_outputs(outputs: list[np.ndarray], output_dir: Path, sample_rate: int) -> list[str]:
     output_dir.mkdir(parents=True, exist_ok=True)
     paths: list[str] = []
-    for index, audio in enumerate(outputs):
-        output_path = output_dir / f"sample_{index:02d}.wav"
+    for offset, audio in enumerate(outputs):
+        output_path = output_dir / f"sample_{start_index + offset:02d}.wav"
         log(f"writing output: {output_path}")
         sf.write(output_path, audio, sample_rate)
         paths.append(str(output_path.resolve()))
